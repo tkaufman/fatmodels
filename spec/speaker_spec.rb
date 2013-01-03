@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'speaker'
 
 describe Speaker do
   context "Save and Retrieve" do
