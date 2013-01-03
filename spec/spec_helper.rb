@@ -1,3 +1,3 @@
 require 'rspec/given'
 
-Dir["../app/**/*.rb"].each {|f| require f}
+Dir["../lib/**/*.rb"].each {|f| require f}

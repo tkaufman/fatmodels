@@ -11,13 +11,32 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121209022135) do
+ActiveRecord::Schema.define(:version => 20130103033316) do
 
-  create_table "speakers", :force => true do |t|
+  create_table "abstracts", :force => true do |t|
+    t.string  "title"
+    t.string  "description"
+    t.integer "speaker_id"
+  end
+
+  create_table "feedbacks", :force => true do |t|
+    t.integer "presentation_id"
+    t.integer "attendee_id"
+    t.integer "rating"
+    t.string  "comment"
+  end
+
+  create_table "people", :force => true do |t|
     t.string "name"
     t.string "email"
-    t.text   "bio"
     t.date   "birthdate"
+    t.string "type"
+  end
+
+  create_table "presentations", :force => true do |t|
+    t.integer "speaker_id"
+    t.integer "abstract_id"
+    t.date    "presented_on"
   end
 
 end
