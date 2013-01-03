@@ -1,3 +1,3 @@
-require 'rspec/given'
+require File.expand_path('../../config/boot', __FILE__)
 
-Dir["../lib/**/*.rb"].each {|f| require f}
+Bundler.require(:test)
