@@ -4,6 +4,7 @@ gem "activerecord"
 gem "sqlite3"
 gem "mysql2"
 gem "activerecord-mysql-adapter"
+gem "database_cleaner"
 
 group :development do
   gem "rake"
