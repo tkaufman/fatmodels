@@ -34,10 +34,49 @@ describe Speaker do
   end
 
   context "scopes" do
-    When(:results) { Speaker.all }
-    Then do
-      results.should have(1).speaker
-      results.first.should == jason
+    context "Sanity Check" do
+      When(:results) { Speaker.all }
+      Then do
+        results.should have(1).speaker
+        results.first.should == jason
+      end
+    end
+
+    context "Aged Speakers" do
+      When(:results) { Speaker.old_timers }
+      Then { results.should have(0).speakers }
+    end
+
+    context "Newb Speakers" do
+      When(:results) { Speaker.young_guns }
+      Then do
+        results.should have(1).speakers
+        results.first.should == jason
+      end
+    end
+
+    context "Accepted" do
+      When(:results) { Speaker.accepted }
+      Then do
+        results.should have(1).speakers
+        results.first.should == jason
+      end
+    end
+
+    context "Accepted Newbs" do
+      When(:results) { Speaker.young_guns.accepted }
+      Then do
+        results.should have(1).speakers
+        results.first.should == jason
+      end
+    end
+
+    context "Good Speakers" do
+      When(:results) { Speaker.good_ones }
+      Then do
+        results.should have(1).speakers
+        results.first.should == jason
+      end
     end
   end
 end
