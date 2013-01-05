@@ -1,5 +1,6 @@
 source "https://rubygems.org"
 
+gem "ruby-debug19"
 gem "activerecord"
 gem "sqlite3"
 gem "mysql2"
