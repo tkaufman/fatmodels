@@ -4,8 +4,11 @@ require 'attendee'
 require 'presentation'
 require 'abstract'
 require 'feedback'
+require 'conference'
 
 describe Speaker do
+  Given!(:codemash) { Conference.create(:name => "CODEMASH!!!") }
+
   Given!(:todd) do
     Attendee.create(:name => "Todd",
                     :email => "todd@testdouble.com",
@@ -19,12 +22,14 @@ describe Speaker do
   Given!(:abstract) do
     Abstract.create(:title => "Fat Models",
                     :description => "Need to be more skinny",
-                    :speaker => jason)
+                    :speaker => jason,
+                    :conference => codemash)
   end
   Given!(:presentation) do
     Presentation.create(:speaker => jason,
                         :abstract => abstract,
-                        :presented_on => Date.civil(2013, 1, 8))
+                        :presented_on => Date.civil(2013, 1, 8),
+                        :conference => codemash)
   end
   Given!(:feedback) do
     Feedback.create(:presentation => presentation,

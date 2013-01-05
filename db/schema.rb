@@ -11,16 +11,25 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130103033316) do
+ActiveRecord::Schema.define(:version => 20130105142021) do
 
   create_table "abstracts", :force => true do |t|
     t.string  "title"
     t.string  "description"
     t.integer "speaker_id"
+    t.integer "conference_id"
+  end
+
+  create_table "conferences", :force => true do |t|
+    t.string "name"
+    t.date   "begins"
+    t.date   "ends"
+    t.text   "location"
   end
 
   create_table "feedbacks", :force => true do |t|
     t.integer "presentation_id"
+    t.integer "conference_id"
     t.integer "attendee_id"
     t.integer "rating"
     t.string  "comment"
@@ -37,6 +46,7 @@ ActiveRecord::Schema.define(:version => 20130103033316) do
     t.integer "speaker_id"
     t.integer "abstract_id"
     t.date    "presented_on"
+    t.integer "conference_id"
   end
 
 end
