@@ -1,6 +1,9 @@
 require 'ostruct'
+
 require 'active_record'
 require 'active_support'
+
+require 'coordinates'
 require 'duration'
 
 class Conference < ActiveRecord::Base
@@ -29,18 +32,7 @@ class Conference < ActiveRecord::Base
   end
 
   def geo_coordinates
-    @geo_coordinates ||= geo_code(location)
-  end
-
-  private
-
-  def geo_code(location)
-    # some fakey-fake geo_code API lib here
-    # hardcoded to Kalahari's coords for convenience
-    OpenStruct.new(
-      :latitude => 41.382745,
-      :longitude => -82.642276
-    )
+    @geo_coordinates ||= Coordinates.from_location(location)
   end
 
 end
