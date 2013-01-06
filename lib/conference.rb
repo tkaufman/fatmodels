@@ -1,5 +1,10 @@
 require 'ostruct'
+
 require 'active_record'
+require 'active_support'
+
+require 'coordinates'
+require 'duration'
 
 class Conference < ActiveRecord::Base
 
@@ -13,39 +18,21 @@ class Conference < ActiveRecord::Base
     begins.to_time
   end
 
+  delegate :overlaps?, :to => :duration
   def duration
-    begins..ends
-  end
-
-  def overlaps?(other)
-    case other
-    when Date then duration.cover? other
-    when Range then (duration.first <= other.last && other.first <= duration.last)
-    when Conference then overlaps? other.duration
-    end
+    @duration ||= Duration.new begins..ends
   end
 
   def before?(other_conference)
-    (begins <=> other_conference.begins) == -1
+    duration.before? other_conference.duration
   end
 
   def after?(other_conference)
-    (begins <=> other_conference.begins) == 1
+    duration.after? other_conference.duration
   end
 
   def geo_coordinates
-    @geo_coordinates ||= geo_code(location)
-  end
-
-  private
-
-  def geo_code(location)
-    # some fakey-fake geo_code API lib here
-    # hardcoded to Kalahari's coords for convenience
-    OpenStruct.new(
-      :latitude => 41.382745,
-      :longitude => -82.642276
-    )
+    @geo_coordinates ||= Coordinates.from_location(location)
   end
 
 end
