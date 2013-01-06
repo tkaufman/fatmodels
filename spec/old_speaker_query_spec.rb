@@ -1,10 +1,10 @@
 require 'spec_helper'
-require 'old_speaker_query'
+require 'queries/old_speaker_query'
 
-describe OldSpeakerQuery do
+describe Queries::OldSpeakerQuery do
   Given!(:jim) { Speaker.create(:name => "Jim Holmes", :birthdate => Date.civil(1945, 5, 12)) }
   Given!(:jason) { Speaker.create(:name => "Jason Karns", :birthdate => Date.civil(1985, 3, 20)) }
-  Given(:query) { OldSpeakerQuery.new }
+  Given(:query) { Queries::OldSpeakerQuery.new }
 
   context "Returns Oldies with All" do
     When(:results) { query.all }
