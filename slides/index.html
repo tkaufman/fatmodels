@@ -85,37 +85,29 @@
       -->
 
       <article>
-        <h3>Convention over Configuration</h3>
+        <h1>Agenda</h1>
         <ol>
-          <li>Tables/Classes</li>
-          <li>Primary Keys</li>
-          <li>Associations</li>
-          <li>Foreign Keys</li>
-          <li>Sequences</li>
-          <li>Aliases</li>
-          <li>Scopes</li>
-        </ol>
+          <li>Value Objects</li>
+          <li>Advanced Scopes</li>
+          <li>Query Objects</li>
+          <li>Service Objects</li>
+          <li>Tips &amp; Tricks (Convention <em>by</em> Configuration!)</li>
+      </article>
+
+      <article>
+        <h2>Convention by Configuration!</h2>
       </article>
 
       <article class='smaller'>
-        <h3>Tables to Classes</h3>
-        <ul>
-          <li>Classnames should be the singular, CamelCased form of the table they represent.
-            <p><var>PpakCase</var>, <var>PpakPerson</var></p>
-          </li>
-          <li>Filenames for the classes should be the classname; singular and snake_cased.
-            <p><var>ppak_case.rb</var>, <var>ppak_person.rb</var></p>
-          </li>
-          <li>Classes map to their respective tables automatically.
-            <p><var>PpakCase</var> maps to <var>ppak_cases</var>; <var>PpakPerson</var> maps to <var>ppak_people</var></p>
-          </li>
-        </ul>
-        <h5>Exceptions:</h5>
-        <p>If the table name does not match the convention, then the table name must be specified in the class via <var>set_table_name</var></p>
-        <pre><code>class PpakModel &lt; KeynoteBase
-  set_table_name :ppak_model
-  ...
-end</code></pre>
+        <h3>Table names to Class names</h3>
+        <dl>
+          <dt>Convention</dt>
+          <dd>Class names are singular, CamelCase. Tables are plural, snake_cased</dd>
+          <dt>Manual Override</dt>
+          <dd><code>set_table_name :something_else</code></dd>
+          <dt>Custom Convention</dt>
+          <dd>see <code>ActiveSupport::Inflector::Inflections</code></dd>
+        </dl>
       </article>
 
       <article class='smaller nobackground'>
