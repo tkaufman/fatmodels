@@ -13,6 +13,7 @@ group :development do
 end
 
 group :test do
+  gem "mocha", :require => false
   gem "rspec"
   gem "rspec-given"
 end

@@ -9,6 +9,8 @@ connection_info = YAML.load_file("db/config.yml")["test"]
 ActiveRecord::Base.establish_connection(connection_info)
 
 RSpec.configure do |config|
+  config.mock_with :mocha
+
   config.before(:suite) do
     DatabaseCleaner.strategy = :transaction
     DatabaseCleaner.clean_with(:truncation)
