@@ -17,29 +17,30 @@
     <title>Keynote and Active Record</title>
     <meta charset='utf-8' />
     <script src='http://html5slides.googlecode.com/svn/trunk/slides.js'></script>
+
+    <style>
+
+      .build .to-build.demolish {
+        opacity: 100;
+      }
+      .build .demolish {
+        opacity: 0;
+      }
+
+      .slides > article:not(.nobackground):not(.biglogo) {
+        background-image: url(../images/nw_logo_small.jpg) !important;
+        background-position: 810px 610px !important;
+      }
+
+      article.smaller p,
+      article.smaller ul,
+      article.smaller ol,
+      article.smaller dl { font-size: 20px; line-height: 24px; letter-spacing: 0; }
+
+      article dt { margin-top:1em; }
+    </style>
   </head>
 
-  <style>
-
-    .build .to-build.demolish {
-      opacity: 100;
-    }
-    .build .demolish {
-      opacity: 0;
-    }
-
-    .slides > article:not(.nobackground):not(.biglogo) {
-      background-image: url(../images/nw_logo_small.jpg) !important;
-      background-position: 810px 610px !important;
-    }
-
-    article.smaller p,
-    article.smaller ul,
-    article.smaller ol,
-    article.smaller dl { font-size: 20px; line-height: 24px; letter-spacing: 0; }
-
-    article dt { margin-top:1em; }
-  </style>
 
   <body style='display: none'>
 
@@ -50,7 +51,7 @@
 
       <article>
         <h1 style="font-size:55px">Lean &amp; Mean Domain Objects</h1>
-        <h3><strike>despite</strike> with Active Record</h3>
+        <h3><del>despite</del> with Active Record</h3>
         <p>Todd Kaufman &amp; Jason Karns <br/> January 8, 2013</p>
       </article>
 
@@ -66,6 +67,113 @@
             <li>dealing with legacy schemas</li>
           </ul></li>
         </ol>
+      </article>
+
+      <article>
+        <h3>Extract Value Objects</h3>
+        <ul>
+          <li>small, usually immutable, data objects.</li>
+          <li>need not be domain specific</li>
+          <li>identity is based on value (or state), rather than object identity</li>
+          <li>examples: numbers, dates, monies, strings</li>
+        </ul>
+        <a href="http://c2.com/cgi/wiki?ValueObject">ValueObject on C2 Wiki</a>
+      </article>
+
+      <article>
+        <h3>Delegation</h3>
+        <ul>
+          <li>ActiveSupport</li>
+          <li>Forwardable (stdlib)</li>
+          <li>DelegateClass (stdlib)</li>
+          <li>SimpleDelegator (stdlib)</li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>Delegation: ActiveSupport</h3>
+        <pre><code>require 'active_support'
+
+class Address
+  attr_accessor :street, :zip
+end
+
+class Person
+  attr_accessor :address
+  delegate :street, :to =&gt; :address
+  delegate :zip, :to =&gt; :address, :prefix =&gt; true
+end
+
+Person.new.street
+Person.new.address_zip
+</code></pre>
+      </article>
+
+      <article>
+        <h3>Delegation: Forwardable</h3>
+        <pre><code>require 'forwardable'
+
+class Address
+  attr_accessor :street, :zip
+end
+
+class Person
+  extend Forwardable
+  attr_accessor :address
+  def_delegator :address, :street
+  def_delegator :address, :zip, :address_zip
+end
+
+Person.new.street
+Person.new.address_zip
+</code></pre>
+      </article>
+
+      <article>
+        <h3>Delegation: DelegateClass</h3>
+        <pre><code>require 'delegate'
+
+class Age &lt; DelegateClass(Fixnum)
+  def can_drive?
+    self &gt;= 16
+  end
+
+  def can_vote?
+    self &gt;= 18
+  end
+
+  def can_drink?
+    self &gt;= 21
+  end
+end
+
+Age.new(5).can_drive? #=&gt; false
+Age.new(2) + 2        #=&gt; 4
+</code></pre>
+      </article>
+
+      <article>
+        <h3>Delegation: SimpleDelegator</h3>
+        <pre><code>class HappyBaby; def speak; "goo ga, goo goo :-)"; end; end
+class FussyBaby; def speak; "WAH! WAH WAAHHHH!!"; end; end
+
+class Baby < SimpleDelegator
+  def initialize
+    @happy, @fussy = HappyBaby.new, FussyBaby.new
+    super @happy
+  end
+
+  def change_diaper; __setobj__(@happy); end
+  def poop; __setobj__(@fussy); end
+end
+
+baby = Baby.new
+baby.speak #=&gt; "goo ga, goo goo :-)"
+baby.poop
+baby.speak #=&gt; "WAH! WAH WAAHHHH!!"
+baby.change_diaper
+baby.speak #=&gt; "goo ga, goo goo :-)"
+</code></pre>
       </article>
 
       <article>
@@ -176,15 +284,59 @@ end
 </code></pre>
       </article>
 
+      <!--
       <article>
-        <h3>Redundant Domain Prefixes? Alias!</h3>
+        <h3>Weird Domain Prefixes? Alias!</h3>
+        <pre><code>class MyBase &lt; ActiveRecord::Base
+  def method_missing(method, *args, &amp;block)
+    if associations.include? method
+      self.class.send :alias_attribute, method, associations[method]
+      self.send method
+    else
+      super
+    end
+  end
+
+  def respond_to?(method, include_private = false)
+    associations.include?(method) or super
+  end
+
+  private
+  def associations
+    @associations ||= Hash[ *self.class.reflect_on_all_associations.map{|assoc| [assoc.name.to_s.sub(/^ppa._/, '').to_sym, assoc.name.to_sym]}.flatten ]
+  end
+end
+</code></pre>
       </article>
+      -->
 
       <article class='fill'>
         <div>
           <h3>Trouble with <em>belongs_to</em> versus <em>has_one</em>, <em>has_many</em>?</h3>
-          <p class='build'><img src='images/toystory.jpg'/></p>
+          <p class='build'><img src='images/toystory.jpg' alt="Toy Story's Woody with Andy's name on his boot"/></p>
         </div>
+      </article>
+
+      <article>
+        <h3>Multiple Databases?</h3>
+        <pre><code>class Database1Base &lt; ActiveRecord::Base
+  self.abstract_class = true
+  establish_connection {:database =&gt; "some_db_1", ...}
+end
+
+class Model1 &lt; Database1Base
+  ...
+end
+
+class Database2Base &lt; ActiveRecord::Base
+  self.abstract_class = true
+  establish_connection {:database =&gt; "some_db_2", ...}
+end
+
+class Model1 &lt; Database2Base
+  ...
+end
+</code></pre>
       </article>
 
       <article>
