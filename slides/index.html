@@ -193,8 +193,19 @@ baby.speak #=&gt; "goo ga, goo goo :-)"
 end
 </code></pre></dd>
           <dt>Custom Convention</dt>
-          <dd>see <code>ActiveSupport::Inflector::Inflections</code></dd>
+          <dd>can be set using ActiveSupport::Inflector if it is an irregular singular/plural form</dd>
         </dl>
+      </article>
+
+      <article>
+        <h3>ActiveSupport::Inflector::Inflections</h3>
+        <pre><code># config/initializers/inflections.rb
+ActiveSupport::Inflector.inflections do |inflect|
+  # by default, AS singularizes 'taxes' to 'taxis'
+  inflect.irregular 'tax', 'taxes'
+  ...
+end
+</code></pre>
       </article>
 
       <article>
@@ -379,7 +390,7 @@ model_selections_for_john = IK::PpakParticModelSelection.for_participant(1357924
       <article>
         <h3>Multi-word Irregular Inflections: Monkey-Patch!</h3>
         <p>For schemas that utilize a table name suffix convention</p>
-        <p>For instance, a pair of tables: <code>orders</code> and <code>orders_vw</code></p>
+        <p>For instance, a pair of tables: <code>orders</code> and <code>orders_audit</code></p>
 
         <pre><code>class ActiveRecord::Reflection::AssociationReflection
   private
@@ -388,6 +399,12 @@ model_selections_for_john = IK::PpakParticModelSelection.for_participant(1357924
     (collection? ? name.to_s.singularize : name.to_s).camelize
   end
 end</code></pre>
+        <pre><code># config/initializers/inflections.rb
+ActiveSupport::Inflector.inflections do |inflect|
+  inflect.irregular 'order_audit', 'orders_audit'
+  ...
+end
+</code></pre>
       </article>
 
       <article>
