@@ -1,6 +1,9 @@
+require 'forwardable'
 require 'active_record'
+require 'valuation'
 
 class Feedback < ActiveRecord::Base
+  extend Forwardable
   include Comparable
 
   belongs_to :presentation
@@ -10,15 +13,14 @@ class Feedback < ActiveRecord::Base
   scope :good_ones, where("rating > 3")
   scope :with_comments, where("comment IS NOT NULL")
 
+  def_delegators :valuation, :poor?, :good?
+
+  def valuation
+    @valuation ||= Valuation.new rating
+  end
+
   def <=>(other)
-    rating <=> other.rating
+    valuation <=> other.valuation
   end
 
-  def poor?
-    rating < 3
-  end
-
-  def good?
-    rating > 3
-  end
 end
