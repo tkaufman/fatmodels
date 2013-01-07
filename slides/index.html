@@ -98,241 +98,150 @@
         <h2>Convention by Configuration!</h2>
       </article>
 
-      <article class='smaller'>
+      <article>
         <h3>Table names to Class names</h3>
         <dl>
           <dt>Convention</dt>
-          <dd>Class names are singular, CamelCase. Tables are plural, snake_cased</dd>
-          <dt>Manual Override</dt>
-          <dd><code>set_table_name :something_else</code></dd>
+          <dd>class names =&gt; singular, CamelCased</dd>
+          <dd>table names =&gt; plural, snake_cased</dd>
+          <dt>Override</dt>
+          <dd><pre><code>class MyClass &lt; ActiveRecord::Base
+  set_table_name :table_of_my_classes
+  ...
+end
+</code></pre></dd>
           <dt>Custom Convention</dt>
           <dd>see <code>ActiveSupport::Inflector::Inflections</code></dd>
         </dl>
       </article>
 
-      <article class='smaller nobackground'>
-        <h3>Primary Keys</h3>
-        <ul>
-          <li>Primary keys are assumed to be named <var>seq_id</var>.</li>
-        </ul>
-        <h5>Exceptions:</h5>
-        <p>If the primary key is not <var>seq_id</var>, then it must be specified via <var>set_primary_key</var>.</p>
-        <pre><code>class PpakPpa &lt; KeynoteBase
-  set_primary_key :ppa_nbr
+      <article>
+        <h3>Primary Key</h3>
+        <dl>
+          <dt>Convention</dt>
+          <dd>column name: <code>id</code></dd>
+          <dt>Override</dt>
+          <dd><pre><code>class MyClass &lt; ActiveRecord::Base
+  set_primary_key :seq_id
   ...
-end</code></pre>
-        <p>If the table has a composite primary key, then it must be specified via <var>set_primary_keys</var>.</p>
-        <pre><code>class PpakFund &lt; KeynoteBase
-  set_primary_keys :code, :sub_type
-  #OR alternatively
-  set_primary_keys [:code, :sub_type]
+end
+</code></pre></dd>
+          <dt>Custom Convention</dt>
+          <dd><pre><code>class ActiveRecord::Base
+  def self.get_primary_key(classname)
+    "seq_id"
+  end
+end
+</code></pre></dd>
+        </dl>
+      </article>
+
+      <article>
+        <h3>Primary Key: Composite Key</h3>
+        <p><code>gem install composite_primary_keys</code></p>
+        <pre><code>class Person &lt; ActiveRecord::Base
+  set_primary_keys :first_name, :last_name
+end
+</code></pre>
+      </article>
+
+      <article>
+        <h3>Foreign Keys: Composite Key</h3>
+        <p>foreign key must define <em>all</em> columns of the composite key and they must be <em>in order</em></p>
+<pre><code>class Person &lt; ActiveRecord::Base
+  set_primary_keys :first_name, :last_name
+  has_many :cars, :foreign_key =&gt; [:first_name, :last_name]
+  ...
+end
+
+class Car &lt; ActiveRecord::Base
+  belongs_to :person, :foreign_key =&gt; [:first_name, :last_name]
   ...
 end</code></pre>
       </article>
 
-      <article class='smaller'>
-        <h3>Associations</h3>
-        <ul>
-          <li>Associations are used to connect related models together.
-            <ul>
-              <li>Models can belong to other models (<var>belongs_to</var>)</li>
-              <li>Models can have one or many other models (<var>has_one</var>, <var>has_many</var>)</li>
-              <li><var>belongs_to</var> and <var>has_one</var> associations are specified in the singular form<br/><var>has_many</var> are plural</li>
-            </ul>
-<pre><code>class PpakCase &lt; KeynoteBase
-  ...
-  belongs_to :ppak_ppa
-  has_many :ppak_contracts
-...
+      <article>
+        <h3>Foreign Key Irregulars</h3>
+        <p>abbreviation only used as foreign keys? <br/>(main class isn't abbreviated)</p>
+        <br/>
+        <pre><code>class Conference &lt; ActiveRecord
+  has_many :speakers, :foreign_key =&gt; :conf_id
+  has_many :attendees, :foreign_key =&gt; :conf_id
+  # this could go on for a while ...
+end
+
+class Speaker &lt; ActiveRecord::Base
+  belongs_to :conference, :foreign_key =&gt; :conf_id
+end
+
+class Attendee &lt; ActiveRecord::Base
+  belongs_to :conference, :foreign_key =&gt; :conf_id
 end</code></pre>
-<pre><code>case1 = IK::PpakCase.first
-case1.ppak_ppa # returns the PpakPpa object for this case
-case1.ppak_contracts # returns the collection of PpakContract objects for this case</code></pre>
-          </li>
-        </ul>
+      </article>
+
+      <article>
+        <pre><code># config/initializers/inflections.rb
+ActiveSupport::Inflector.inflections do |inflect|
+  inflect.foreign_key :conference =&gt; :conf_id # requires a monkey-patch
+end
+</code></pre>
+        <pre><code>class Conference &lt; ActiveRecord::Base
+  has_many :speakers
+  has_many :attendees
+  # this could go on for a while ...
+end
+
+class Speaker &lt; ActiveRecord::Base
+  belongs_to :conference
+end
+
+class Attendee &lt; ActiveRecord::Base
+  belongs_to :conference
+end</code></pre>
+      </article>
+
+      <article>
+        <h3>Foreign Key Irregulars: How? Monkey-Patch!</h3>
+        <pre><code>class ActiveSupport::Inflector::Inflections
+  attr_reader :foreign_keys
+
+  def foreign_keys
+    @foreign_keys ||= {}
+  end
+
+  def foreign_key(association_name_to_column_name)
+    association_name_to_column_name.each do |association_name, column_name|
+      foreign_keys[association_name.to_s] = column_name.to_s
+    end
+  end
+end
+</code></pre>
+      </article>
+
+      <article>
+        <h3>Redundant Domain Prefixes? Alias!</h3>
       </article>
 
       <article class='fill build'>
         <div>
-          <h3>Toy Story</h3>
+          <h3>Trouble with <em>belongs_to</em> versus <em>has_one</em>, <em>has_many</em>?</h3>
           <p>
-            <img src='images/toystory.jpg'>
+            <img src='images/toystory.jpg'/>
           </p>
-          <ul>
-            <li class='white'>When choosing between<br/>belongs_to/has_one/has_many,<br/>remember the Toy Story rule.</li>
-          </ul>
         </div>
       </article>
 
-      <article class='smaller nobackground'>
-        <h3>Foreign Keys</h3>
-        <dl>
-
-        <dt>belongs_to</dt>
-        <dd>Foreign Keys on belongs_to associations are assumed to use the <kbd>association_name+'_seq_id'</kbd>, without the ppa* prefix.
-        <pre><code>class PpakContract &lt; KeynoteBase
-  # foreign key inferred from association name (:ppak_case) as case_seq_id
-  belongs_to :ppak_case
-  ...
-end</code></pre></dd>
-        <dt>has_many</dt>
-        <dd>Foreign Keys on has_many associations are assumed to use the <kbd>snake_cased_class_name+'_seq_id'</kbd> on the child table, without the ppa* prefix.
-        <pre><code>class PpakCase &lt; KeynoteBase
-  # foreign key inferred from class name (PpakCase) as case_seq_id
-  has_many :ppak_contracts
-  ...
-end</code></pre></dd>
-        </dl>
-      </article>
-
-      <article class='smaller'>
-        <h3>Composite Foreign Keys</h3>
-        <p>When an association points to a table with a composite primary key, the foreign key must define all columns of the composite key <strong>in order</strong>.</p>
-<pre><code>class PpakFund &lt; KeynoteBase
-  set_primary_keys :code, :sub_type
-  has_many :ppak_invest_options, :foreign_key =&gt; [:fnd_code, :fnd_sub_type]
-  ...
-end
-
-class PpakInvestOption &lt; KeynoteBase
-  belongs_to :ppak_fund, :foreign_key =&gt; [:fnd_code, :fnd_sub_type]
-  ...
-end</code></pre>
-      </article>
-
-      <article class='smaller'>
-      <h3>Foreign Key Irregulars</h3>
-      <ul>
-        <li>Not all tables in keynote follow the <kbd>snake_cased_class_name+'_seq_id'</kbd> convention for foreign_keys</li>
-        <li>Even without the convention, many are still very consistent:
-        <ul>
-          <li><var>ppak_invest_option</var> is almost always <var>ivop_seq_id</var></li>
-          <li><var>ppak_partic_enrlmnt</var> is usually <var>partic_seq_id</var></li>
-        </ul></li>
-        <li>These consistent convention-breakers can be specified in one location to avoid duplication across all classes
-<pre><code># config/initializers/inflections.rb
-ActiveSupport::Inflector.inflections do |inflect|
-  inflect.foreign_key :ppak_contract =&gt; :cont_seq_id # or :acct_owner_cont_seq_id
-  inflect.foreign_key :ppak_invest_option =&gt; :ivop_seq_id
-  inflect.foreign_key :ppak_partic_enrlmnt =&gt; :partic_seq_id # or :acct_owner_partic_seq_id
-end</code></pre>
-        </li>
-      </ul>
-      </article>
-
-      <article class='smaller'>
-        <h3>Foreign Key Summary</h3>
-        <p>Foreign Keys are defined in <strong>one</strong> of the following ways:</p>
-      <ol>
-        <li>inferred to be <kbd>snake_cased_class_name+'_seq_id'</kbd>
-        <pre><code>belongs_to :ppak_case</pre></code></li>
-        <li>defined in <kbd>config/initializers/inflections.rb</kbd>
-<pre><code>ActiveSupport::Inflector.inflections do |inflect|
-  inflect.foreign_key :ppak_invest_option =&gt; :ivop_seq_id
-end</code></pre></li>
-        <li>defined explicitly on the association itself
-<pre><code>belongs_to :ppak_contract, :foreign_key =&gt; :acct_owner_cont_seq_id
-#using composite foreign keys
-belongs_to :ppak_fund, :foreign_key =&gt; :fnd_code, :fnd_sub_type</code></pre></li>
-      </ol>
-      </article>
-
-      <article class='smaller'>
-      <h3>When definining an association, ask yourself:</h3>
-
-      <dl>
-        <dt>Does the foreign_key use the <kbd>snake_cased_class_name+'_seq_id'</kbd> convention?</dt>
-        <dd>Yes: you're done. You don't need to specify a foreign_key</dd>
-        <dd>Otherwise&hellip;</dd>
-
-        <dt>Is the foreign_key a composite key?</dt>
-        <dd>Yes: Specify the foreign_key explicitly with the association</dd>
-        <dd>Otherwise&hellip;</dd>
-
-        <dt>Is the foreign_key already declared in <kbd>config/initializers/inflections.rb</kbd>?</dt>
-        <dd>Yes: you're done. You don't need to specify a foreign_key</dd>
-        <dd>Otherwise&hellip;</dd>
-
-        <dt>Is the foreign_key already declared in <kbd>config/initializers/inflections.rb</kbd> with a <em>different</em> value?</dt>
-        <dd>Yes: Specify the foreign_key explicitly with the association</dd>
-
-        <dt>Does the foreign_key use it's own consistent naming scheme?</dt>
-        <dd>Yes: add it to <kbd class='smaller'>config/initializers/inflections.rb</kbd></dd>
-        <dd>No: Specify the foreign_key explicitly with the association</dd>
-
-      </dl>
-      </article>
-
-      <article class='smaller'>
-        <h3>Sequences</h3>
-        <ul>
-          <li>Sequences for primary keys are assumed to be the <kbd>snake_cased_class_name+'_seq'</kbd>. (e.g. <var>ppak_cases_seq</var>)</li>
-        </ul>
-        <h5>Exception</h5>
-        <ul>
-          <li>If the sequence does not follow the convention, it must be specified via <var>set_sequence_name<var>.
-<pre><code>class PpakParticModelSelection &lt; KeynoteBase
-  ...
-  # assumed to be :ppak_partic_model_selection_seq
-  set_sequence_name :ppak_partic_model_select_seq
-  ...
-end </code></pre>
-          </li>
-        </ul>
-      </article>
-
-      <article class='smaller'>
-        <h3>Aliases</h3>
-        <ul>
-          <li>IktivRecord automatically creates an alias for every association without the ppa* prefix. So you can use <var>case.contracts</var> instead of <var>case.ppak_contracts</var></li>
-          <li>You can also define your own aliases.<br/>Convention: create aliases without abbreviations. This eliminates the need to guess what form of abbreviation was used.</p>
-<pre><code>person = PpakPerson.new
-# before (ugly)
-person.partic_enrlmnts
-# with alias_attribute :enrollments :ppak_partic_enrlmnts defined
-person.enrollments
-
-model = PpakModel.new
-# before (redundant)
-model.model_versions
-# with alias_attribute :versions :ppak_model_versions
-model.versions
-</code></pre>
-          </li>
-          <li>Aliases can also be defined for attributes (column_names), but in practice, this does not offer much benefit.</li>
-        </ul>
-      </article>
-
-      <article class='smaller'>
-        <h3>Scopes</h3>
-        <ul>
-          <li>Name them as you would expect to be used (e.g. <var>IK::PpakCase.active</var>).
-            <ul><li>The scopes should describe the class they are on. (e.g. <var>PpakCase.has_fdic</var>)</li></ul>
-          </li>
-          <li>They can be chained.
-            <ul><li>If you want a scope that does two things, create two scopes and chain them. (e.g. <var>PpakCase.active.clear</var> returns all active cases with a Clear contract)</li></ul>
-          </li>
-          <li>Try not to create scopes for everything.
-            <ul><li>Should be used for very common types of queries. Start by getting the objects with plain ruby and only convert to scopes when necessary.</li></ul>
-          </li>
-        </ul>
-<pre><code># a collection of active case objects
-active_cases = IK::PpakCase.active
-# a collection of active Clear Advantage case objects
-active_clear_cases = IK::PpakCase.active.clear</code></pre>
-      </article>
-
-      <article class='smaller'>
+      <article>
         <h3>Defining Scopes</h3>
         <ul>
-          <li>Scopes can be defined with a string
+          <li>defined with a string
             <pre><code>scope :trust_effective_date_established, where("trust_effective_date is not null")</code></pre>
           </li>
-          <li>Scopes can be defined with a hash
+          <li>defined with a hash
 <pre><code>scope :trust_effective_date_not_established, where(:trust_effective_date =&gt; nil)
 scope :is_waive_override, where(:waive_override =&gt; 'Y')</code></pre>
           </li>
-          <li>Scopes can be defined with a heredoc string
+          <li>defined with a heredoc string (bonus: RubyMine colorizes heredoc strings according to heredoc delimiters)
             <pre><code>scope :flexible_advantage, where(&lt;&lt;-SQL)
   seq_id in (SELECT case_seq_id
              FROM ppak_contracts
@@ -342,18 +251,18 @@ SQL</code></pre>
         </ul>
       </article>
 
-      <article class='smaller'>
+      <article>
         <h3>Advanced Scopes</h3>
         <ul>
-          <li>Scopes can take parameters
+          <li>can take parameters
 <pre><code>scope :for_participant, lambda { |partic| {:where =&gt; "partic_seq_id = #{partic}"} }
 # usage
 model_selections_for_john = IK::PpakParticModelSelection.for_participant(1357924680)</code></pre>
           </li>
-          <li>Scopes can be defined with pseudo-prepared SQL statements
+          <li>can be defined with pseudo-prepared SQL statements
             <pre><code>scope :active_as_of, lambda { |asof_date| where("record_start_datetime &lt;= ?", asof_date) }</code></pre>
           </li>
-          <li>Scopes can build upon other scopes
+          <li>can build upon other scopes
             <pre><code>scope :active, lambda { active_as_of(IK::PpakDateCard.first.daily_cycle_to_date) }</code></pre>
           </li>
         </article>
