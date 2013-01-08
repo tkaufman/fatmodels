@@ -28,7 +28,7 @@
       }
 
       .slides > article:not(.nobackground):not(.biglogo) {
-        background-image: url(../images/nw_logo_small.jpg) !important;
+        background-image: url(../images/testdouble.png) !important;
         background-position: 810px 610px !important;
       }
 
@@ -234,10 +234,14 @@ baby.speak #=&gt; "goo ga, goo goo :-)"
 </code></pre>
       </article>
 
-      <article class='smaller'>
+      <article>
+        <h1>Scopes</h1>
+      </article>
+
+      <article>
         <h3>Scopes Gone Wrong</h3>
-        <ul>
-          <li>Scopes can sometimes get a little unwieldy
+        <p>As your object model grows, scopes can get large</p>
+        <p>and a little unwieldy</p>
 <pre><code>  scope :for_rate_contracts, lambda { |rate_contracts|
     rate_contracts = Array.wrap(rate_contracts)
 
@@ -261,43 +265,34 @@ baby.speak #=&gt; "goo ga, goo goo :-)"
     end
   }
 </code></pre>
-          </li>
-        </ul>
       </article>
 
-      <article class='smaller'>
+      <article class='build'>
         <h3>Resulting In</h3>
-        <ul>
-          <li>Really freaking big AR models</li>
-          <li>Especially when your system has <i>God Objects</i></li>
-          <li>Big Objects leads to big and difficult specs</li>
-          <li>Usually lacking in test coverage</li>
-          <li>Leading to some difficult to find bugs</li>
-        </ul>
+        <p>Really freaking big AR models</p>
+        <p>Especially when your system has <i>God Objects</i></p>
+        <p>Big Objects leads to big and difficult specs</p>
+        <p>Usually lacking in test coverage</p>
+        <p>Leading to some difficult to find bugs</p>
       </article>
 
-      <article class='smaller'>
+      <article>
         <h3>Rails Scope Cleverness also Confuses</h3>
-        <ul>
-          <li>Default Scopes Kill Kittens!
-            <pre><code>
-              default_scope :conditions => {:deactivated_at => nil}
-            </code></pre>
-          </li>
-          <li>Please don't use...</li>
-        </ul>
+        <p>Default Scopes Kill Kittens!</p>
+        <pre><code>
+          default_scope :conditions => {:deactivated_at => nil}
+        </code></pre>
+        <p>Please don't use...</p>
       </article>
 
-      <article class='smaller'>
+      <article>
         <h3>Time to ask yourself, What Would Martin Fowler Do?</h3>
-        <ul>
-          <li>Extract Class when:</li>
-          <li>You have one class doing work that should be done by two.</li>
-          <li>Query objects to the rescue!</li>
-        </ul>
+        <p>Extract Class when:</p>
+        <p>You have one class doing work that should be done by two.</p>
+        <p>Query objects to the rescue!</p>
       </article>
 
-      <article class='smaller'>
+      <article>
         <h2>Exercise</h2>
         <h3>Simple Scope Extraction</h3>
         <ul>
@@ -306,7 +301,7 @@ baby.speak #=&gt; "goo ga, goo goo :-)"
         </ul>
       </article>
 
-      <article class='smaller'>
+      <article>
         <h2>Exercise</h2>
         <h3>Advanced Scope Extraction</h3>
         <ul>
@@ -315,15 +310,13 @@ baby.speak #=&gt; "goo ga, goo goo :-)"
         </ul>
       </article>
 
-      <article class='smaller'>
+      <article>
         <h3>Gripes</h3>
-        <ul>
-          <li>Scopes can be chained</li>
-          <li>I like calling Speaker.accepted</li>
-        </ul>
+        <p>Scopes can be chained</p>
+        <p>I like calling Speaker.accepted</p>
       </article>
 
-      <article class='smaller'>
+      <article>
         <h3>Pros</h3>
         <ul>
           <li>Isolates complex query logic</li>
@@ -334,30 +327,27 @@ baby.speak #=&gt; "goo ga, goo goo :-)"
         </ul>
       </article>
 
-      <article class='smaller'>
+      <article>
         <h3>Cons</h3>
         <ul>
           <li>Probably more complex than what they are worth for simple scopes</li>
         </ul>
       </article>
 
-      <article class='smaller'>
+      <article>
         <h3>AR Callbacks</h3>
-        <ul>
-          <li>Easy to use lifecycle hooks</li>
-          <li>Easy to use often == widely misused</li>
-        </ul>
+        <p>Easy to use lifecycle hooks</p>
+        <p>Easy to use often == widely misused</p>
       </article>
 
-      <article class='smaller'>
+      <article>
         <h3>Lifecycle Hooks</h3>
-        <ul>
-          <li>Quick, list the Create lifecycle hooks in order</li>
-          <li>The first is <b>before_validation</b></li>
+        <p>Quick, list the Create lifecycle hooks in order</p>
+        <p>The first is <b>before_validation</b></p>
         </ul>
       </article>
 
-      <article class='smaller'>
+      <article>
         <h3>From guides.rubyonrails.org: </h3>
         <ul>
           <li>before_validation</li>
@@ -371,7 +361,7 @@ baby.speak #=&gt; "goo ga, goo goo :-)"
         </ul>
       </article>
 
-      <article class='smaller'>
+      <article>
         <h3>From logicalfriday.com</h3>
         <pre><code>
 class User < ActiveRecord::Base
@@ -386,45 +376,38 @@ class User < ActiveRecord::Base
 
 end
 </code></pre>
+        <p>Why does this result in the occassional ActiveRecord::RecordNotFound exception</p>
       </article>
 
-      <article class='smaller'>
-        <h3>Why does this result in the occassional ActiveRecord::RecordNotFound exception</h3>
-      </article>
-
-      <article class='smaller'>
+      <article>
         <h3>Whoops</h3>
-        <ul>
-          <li>The rails guide is incorrect.</li>
-          <li>after_commit is also a hook, executed after after_save</li>
-          <li>Use it instead of after_save if you are seeing things like message being enqueued before the db has the record</li>
-        </ul>
+        <p>The rails guide is incorrect.</p>
+        <p>after_commit is also a hook, executed after after_save</p>
+        <p>Use it instead of after_save if you are seeing things like message being enqueued before the db has the record</p>
       </article>
 
-      <article class='smaller'>
+      <article>
         <h3>Other Gotchas</h3>
-        <ul>
-          <li>When multiple callbacks on a file, ordering is important
-            <pre><code>
+        <p>When multiple callbacks on a file, ordering is important
+          <pre><code>
 before_validation :setup_c_and_i_data, :unless => :recurring?, :on => :create
 after_create :update_selected_control_strategies
 after_create :create_triggers, :unless => :template?
 after_commit :send_create_email, :unless => Proc.new { | ce | ce.template? || ce.recurring? }, :on => :create
-            </code></pre>
-          </li>
-          <li>Not all methods on a model provided by AR trigger callbacks (update_all for example)
-            <pre><code>
+          </code></pre>
+        </p>
+        <p>Not all methods on a model provided by AR trigger callbacks (update_all for example)
+          <pre><code>
  User.where(:id=>@user.id).update_all(:credits => @user.credits+5)
-            </code></pre>
-          </li>
-        </ul>
+          </code></pre>
+        </p>
       </article>
 
-      <article class='smaller'>
-        <h3>Maybe we should stop screwing around with half assed AOP approaches inside our already chunky AR models</h3>
+      <article>
+        <h2>Maybe we should stop screwing around with half assed AOP approaches inside our already chunky AR models</h2>
       </article>
 
-      <article class='smaller'>
+      <article class="smaller">
         <h3>Services When the Callback is</h3>
         <ul>
           <li>interacting with other models</li>
@@ -452,7 +435,7 @@ end
         </ul>
       </article>
 
-      <article class='smaller'>
+      <article>
         <h3>Observers when the Callback is</h3>
         <ul>
           <li>the same across different models</li>
@@ -468,7 +451,7 @@ end
         </ul>
       </article>
 
-      <article class='smaller'>
+      <article>
         <h2>Exercise</h2>
         <h3>Clean up the abstract acceptance conversion into a presentation acceptance service</h3>
         <ul>
@@ -477,7 +460,7 @@ end
         </ul>
       </article>
 
-      <article class='smaller'>
+      <article>
         <h3>Service Pros</h3>
         <ul>
           <li>Clear division of responsibility for complex actions</li>
@@ -492,15 +475,13 @@ end
         </ul>
       </article>
 
-      <article class='smaller'>
+      <article>
         <h2>Exercise</h2>
         <h3>New requirement, we must email whenever speaker info OR abstract info is submitted</h3>
-        <ul>
-          <li>Leverage Active Record Observer</li>
-        </ul>
+        <p>Leverage Active Record Observer</p>
       </article>
 
-      <article class='smaller'>
+      <article>
         <h3>Observer Pros</h3>
         <ul>
           <li>Easy to consolidate cross domain model logic</li>
@@ -519,6 +500,23 @@ config.active_record.observers = :user_observer
 
       <article>
         <h1>Closing Remarks</h1>
+      </article>
+
+      <article class="build">
+        <h3>Use your own head</h3>
+        <p>DHH's opinions need not be your own</p>
+        <p>Aggresssively prune your Active Record models to keep them clean</p>
+        <p>Favor these types of class extractions, other patterns, and develop your own</p>
+      </article>
+
+      <article>
+        <h3>Thanks!</h3>
+        <p>@jasonkarns &nbsp; @toddkaufman</p>
+        <img src="../">
+      </article>
+
+      <article>
+        <h1>Extras</h1>
       </article>
 
       <article>
