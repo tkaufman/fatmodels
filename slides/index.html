@@ -56,6 +56,25 @@
       </article>
 
       <article>
+        <h3>Public Service Announcement</h3>
+        <p>If you have Git, clone this repo: https://github.com/tkaufman/fatmodels</p>
+        <br/>
+        <br/>
+        <p>If you don't see us for a thumbdrive</p>
+      </article>
+
+      <article>
+        <h3>Steps to get Started!</h3>
+        <ol>
+          <li>bundle install</li>
+          <li>bundle exec rake db:create</li>
+          <li>bundle exec rake db:migrate</li>
+          <li>bundle exec rake db:test:prepare</li>
+          <li>bundle exec rspec</li>
+        </ol>
+      </article>
+
+      <article>
         <h3>Agenda</h3>
         <ol>
           <li>Fatness</li>
@@ -155,7 +174,7 @@ end
 
 class Address
   attr_accessor :street1, :street2, :city, :state, :zip
-  
+
   def initialize(street1, street2, city, state, zip)
     @street1, @street2 = street1, street2
     @city, @state, @zip = city, state, zip
