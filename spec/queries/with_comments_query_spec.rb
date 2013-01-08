@@ -1,4 +1,6 @@
 require 'queries/with_comments_query'
+require 'queries/positive_feedback_query'
+require 'feedback'
 require 'spec_helper'
 
 describe Queries::WithCommentsQuery do
@@ -12,18 +14,16 @@ describe Queries::WithCommentsQuery do
     Then do
       results.should have(1).feedback
       results.should include(comment)
-      results.should_not include(no_comment)
     end
   end
 
   context "Chained query fun!" do
-    Given { Feedback.update_all(:rating => 4) }
+    Given { comment.update_attribute(:rating, 4) }
     Given(:chained_query) { Queries::PositiveFeedbackQuery.new(query.relation) }
     When(:results) { chained_query.all }
     Then do
       results.should have(1).feedback
       results.should include(comment)
-      results.should_not include(no_comment)
     end
   end
 
