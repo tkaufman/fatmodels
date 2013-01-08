@@ -1,6 +1,9 @@
+require 'forwardable'
 require 'active_record'
+require 'rating_serializer'
 
 class Feedback < ActiveRecord::Base
+  extend Forwardable
   include Comparable
 
   belongs_to :presentation
@@ -10,15 +13,11 @@ class Feedback < ActiveRecord::Base
   scope :good_ones, where("rating > 3")
   scope :with_comments, where("comment IS NOT NULL")
 
+  serialize :rating, RatingSerializer.new
+  def_delegators :rating, :poor?, :good?
+
   def <=>(other)
     rating <=> other.rating
   end
 
-  def poor?
-    rating < 3
-  end
-
-  def good?
-    rating > 3
-  end
 end
