@@ -30,10 +30,10 @@ ActiveRecord::Schema.define(:version => 20130105220620) do
 
   create_table "feedbacks", :force => true do |t|
     t.integer "presentation_id"
-    t.integer "conference_id"
     t.integer "attendee_id"
     t.integer "rating"
     t.string  "comment"
+    t.integer "conference_id"
   end
 
   create_table "people", :force => true do |t|
@@ -48,6 +48,13 @@ ActiveRecord::Schema.define(:version => 20130105220620) do
     t.integer "abstract_id"
     t.date    "presented_on"
     t.integer "conference_id"
+  end
+
+  create_table "speakers", :force => true do |t|
+    t.string "name"
+    t.string "email"
+    t.text   "bio"
+    t.date   "birthdate"
   end
 
 end
