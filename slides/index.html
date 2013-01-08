@@ -14,7 +14,7 @@
 
 <html>
   <head>
-    <title>Keynote and Active Record</title>
+    <title>Lean &amp; Mean Domain Objects</title>
     <meta charset='utf-8' />
     <script src='http://html5slides.googlecode.com/svn/trunk/slides.js'></script>
 
@@ -128,6 +128,10 @@ end
       </article>
 
       <article>
+        <h1>Value Objects</h1>
+      </article>
+
+      <article>
         <h3>Extract Value Objects</h3>
         <ul>
           <li>small, usually immutable, data objects.</li>
@@ -139,12 +143,44 @@ end
       </article>
 
       <article>
+        <h3>Example</h3>
+        <pre><code>class Person &lt; ActiveRecord::Base
+  # attr_accessor :street1, :street2, :city, :state, :zip
+  attr_accessor :address
+
+  def address
+    @address ||= Address.new @street1, @street2, @city, @state, @zip
+  end
+end
+
+class Address
+  attr_accessor :street1, :street2, :city, :state, :zip
+  
+  def initialize(street1, street2, city, state, zip)
+    @street1, @street2 = street1, street2
+    @city, @state, @zip = city, state, zip
+  end
+end
+</code></pre>
+      </article>
+
+      <article>
         <h3>Delegation</h3>
         <ul>
           <li>ActiveSupport</li>
           <li>Forwardable (stdlib)</li>
           <li>DelegateClass (stdlib)</li>
           <li>SimpleDelegator (stdlib)</li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>Exercise</h3>
+        <ul>
+          <li><code>Conference</code> model has two low-hanging fruits (coordinates, duration ?)</li>
+          <li><code>Feedback</code> model has a nice 'rating' value object potential</li>
+          <li>may need to update tests as appropriate</li>
+          <li>may use delegatation to reduce impact to original API</li>
         </ul>
       </article>
 
@@ -178,12 +214,10 @@ end
 class Person
   extend Forwardable
   attr_accessor :address
-  def_delegator :address, :street
-  def_delegator :address, :zip, :address_zip
+  def_delegator :address, :street # Person.new.street
+  def_delegator :address, :zip, :address_zip # Person.new.address_zip
 end
 
-Person.new.street
-Person.new.address_zip
 </code></pre>
       </article>
 
@@ -694,6 +728,7 @@ end
 </code></pre>
       </article>
 
+      <!--
       <article>
         <h3>Defining Scopes</h3>
         <ul>
@@ -730,6 +765,7 @@ model_selections_for_john = IK::PpakParticModelSelection.for_participant(1357924
           </li>
         </ul>
       </article>
+      -->
 
       <article>
         <h3>Multi-word Irregular Inflections: Monkey-Patch!</h3>
